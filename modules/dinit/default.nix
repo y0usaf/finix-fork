@@ -113,7 +113,10 @@ in
     };
     dinit.services.mount-fstab = {
       type = "scripted";
-      command = "${pkgs.util-linux}/bin/mount -a";
+      # mount -a exits non-zero if any single fstab entry fails; since this is a hard
+      # boot.d dependency, one bad entry would otherwise fail the whole boot target.
+      # failures are still logged by mount itself.
+      command = "${pkgs.util-linux}/bin/mount -av || true";
       boot = true;
     };
     system.activation.scripts.dinit-reload = {
